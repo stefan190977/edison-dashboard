@@ -59,6 +59,7 @@ const CSS = `
 .bt.r{border-color:#c0492b;color:#ff9c7a}.bt.o{border-color:#665;color:#998}
 .empty{opacity:.6;font-size:13px;text-align:center;padding:8px}
 `;
+const TR = {"de": {"back": "ZURÜCK ZUR ÜBERSICHT", "solar": "SOLAR", "heating": "HEIZUNG", "camera": "KAMERA", "battery": "BATTERIE", "boilerroom": "KESSELHAUS", "security": "SICHERHEIT", "batteries": "BATTERIEN", "messages": "NACHRICHTEN", "lighting": "BELEUCHTUNG", "usage": "VERBRAUCH", "rooms": "RÄUME", "surveillance": "ÜBERWACHUNG", "weather": "WETTER", "waste": "MÜLLABHOLUNG", "allon": "ALLE AN", "alloff": "ALLE AUS", "power": "LEISTUNG", "energy": "ENERGIE", "off": "AUS", "heat": "HEIZEN", "boost": "BOOST", "allok": "Alles in Ordnung", "lowest": "Niedrigste", "devices": "Geräte", "grid": "Netz", "target": "Soll ", "nolights": "Keine Lichter", "nocams": "Keine Kameras", "noth": "Keine Thermostate", "nobat": "Keine Batterie-Sensoren", "nowaste": "Kein Müll-Sensor gewählt", "noboiler": "Kessel-Sensoren in den Einstellungen wählen", "pwrs": "LEISTUNGS-SENSOREN", "alarm": "ALARM"}, "en": {"back": "BACK TO OVERVIEW", "solar": "SOLAR", "heating": "HEATING", "camera": "CAMERA", "battery": "BATTERY", "boilerroom": "BOILER ROOM", "security": "SECURITY", "batteries": "BATTERIES", "messages": "MESSAGES", "lighting": "LIGHTING", "usage": "USAGE", "rooms": "ROOMS", "surveillance": "SURVEILLANCE", "weather": "WEATHER", "waste": "WASTE", "allon": "ALL ON", "alloff": "ALL OFF", "power": "POWER", "energy": "ENERGY", "off": "OFF", "heat": "HEAT", "boost": "BOOST", "allok": "All clear", "lowest": "Lowest", "devices": "Devices", "grid": "Grid", "target": "Target ", "nolights": "No lights", "nocams": "No cameras", "noth": "No thermostats", "nobat": "No battery sensors", "nowaste": "No waste sensor selected", "noboiler": "Select boiler sensors in the settings", "pwrs": "POWER SENSORS", "alarm": "ALARM"}};
 const E = s => String(s ?? "").replace(/[&<>"']/g, m => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[m]));
 const LIGHT_ICONS = ["mdi:lightbulb-outline", "mdi:lightbulb-on"];
 
@@ -78,6 +79,8 @@ class EdisonDashboard extends HTMLElement {
   set panel(p) { this._panel = p; this._cfg = (p && p.config) || {}; this.classList.toggle("kiosk", !!this._cfg.kiosk); this._sig = ""; this._render(); }
   set narrow(_) {} set route(_) {}
   set hass(h) { const first = !this._hass; this._hass = h; if (first || this._changed()) this._render(); }
+
+  t(k) { const l = ((this._hass && this._hass.language) || "de").slice(0, 2); return (TR[l] || TR.en)[k] ?? TR.en[k] ?? k; }
 
   /* ---------- config & discovery ---------- */
   get C() { return this._cfg.config || {}; }
@@ -136,8 +139,8 @@ class EdisonDashboard extends HTMLElement {
   _btn(label, go, icon, cls = "") { return `<div class="bn ${cls}" data-go="${go}">${icon ? `<ha-icon icon="${icon}"></ha-icon>` : ""}<span>${label}</span></div>`; }
   _hdr() {
     const sub = this._cfg.subtitle || "";
-    const left = this._view === "home" ? "" : this._btn("ZURÜCK ZUR ÜBERSICHT", "home", "mdi:home");
-    const nav = [["solar", "SOLAR", "mdi:solar-power"], ["heizung", "HEIZUNG", "mdi:radiator"], ["kamera", "KAMERA", "mdi:cctv"], ["batterien", "BATTERIE", "mdi:battery"]]
+    const left = this._view === "home" ? "" : this._btn(this.t("back"), "home", "mdi:home");
+    const nav = [["solar", this.t("solar"), "mdi:solar-power"], ["heizung", this.t("heating"), "mdi:radiator"], ["kamera", this.t("camera"), "mdi:cctv"], ["batterien", this.t("battery"), "mdi:battery"]]
       .map(([k, l, i]) => this._btn(l, k, i, this._view === k ? "on" : "")).join("");
     return `<div class="hd"><div class="hc">${left}</div><div class="tt"><div class="nav">${nav}</div>
       <h1>${E((this._cfg.title || "").toUpperCase())}</h1><p>${E(sub)}</p></div>
@@ -178,24 +181,24 @@ class EdisonDashboard extends HTMLElement {
       return `<div class="rm ${heat ? "heat" : ""}" data-mi="${e}"><span>${E(this._room(e))}</span><b>${s.attributes.current_temperature ?? "–"}° / ${s.attributes.temperature ?? "–"}°</b></div>`; }).join("");
     const waste = this._waste();
     const L = `
-      <div class="sec" data-t="KESSELHAUS">${boiler || flow ? `
+      <div class="sec" data-t="${this.t('boilerroom')}">${boiler || flow ? `
         ${boiler ? `<div class="big">${E(S[boiler]?.state ?? "–")}°</div><div class="cap">${E(this._name(boiler)).toUpperCase()}</div>` : ""}
-        ${flow ? `<div class="row"><span>${E(this._name(flow))}</span><b>${E(S[flow]?.state ?? "–")}°</b></div>` : ""}` : `<div class="empty">Kessel-Sensoren in den Einstellungen wählen</div>`}</div>
-      <div class="sec" data-t="SICHERHEIT">${alarm ? `<div class="big" data-mi="${this.alarm}">${E(alarm.state.replace(/_/g, " ").toUpperCase())}</div>` : ""}
+        ${flow ? `<div class="row"><span>${E(this._name(flow))}</span><b>${E(S[flow]?.state ?? "–")}°</b></div>` : ""}` : `<div class="empty">${this.t("noboiler")}</div>`}</div>
+      <div class="sec" data-t="${this.t('security')}">${alarm ? `<div class="big" data-mi="${this.alarm}">${E(alarm.state.replace(/_/g, " ").toUpperCase())}</div>` : ""}
         ${this.statuses.map(e => `<div class="row"><span>${E(this._name(e))}</span><b>${S[e]?.state === "on" ? "⚠" : "OK"}</b></div>`).join("") || (alarm ? "" : `<div class="empty">–</div>`)}</div>
-      <div class="sec" data-t="BATTERIEN"><div class="row"><span>Niedrigste</span><b>${this._lowBat()}</b></div><div class="row"><span>Geräte</span><b>${this.batteries.length}</b></div></div>
-      <div class="sec" data-t="NACHRICHTEN">${msgs.length ? msgs.map(m => `<div class="msg">⚠ ${E(m)}</div>`).join("") : `<div class="msg ok">Alles in Ordnung</div>`}</div>`;
+      <div class="sec" data-t="${this.t('batteries')}"><div class="row"><span>${this.t("lowest")}</span><b>${this._lowBat()}</b></div><div class="row"><span>${this.t("devices")}</span><b>${this.batteries.length}</b></div></div>
+      <div class="sec" data-t="${this.t('messages')}">${msgs.length ? msgs.map(m => `<div class="msg">⚠ ${E(m)}</div>`).join("") : `<div class="msg ok">${this.t("allok")}</div>`}</div>`;
     const M = `
-      <div class="sec" data-t="BELEUCHTUNG"><div class="bl">${lamps || `<div class="empty">Keine Lichter</div>`}</div>
-        <div class="alls"><div class="bn" data-all="turn_on">ALLE AN</div><div class="bn" data-all="turn_off">ALLE AUS</div></div></div>
-      <div class="sec" data-t="VERBRAUCH"><div class="row"><span>Solar</span><b>${this._fmtW(sol)}</b></div>
-        <div class="row"><span>Netz</span><b>${this._fmtW(grid)}</b></div></div>
-      <div class="sec" data-t="RÄUME">${rooms || `<div class="empty">Keine Thermostate</div>`}</div>`;
+      <div class="sec" data-t="${this.t('lighting')}"><div class="bl">${lamps || `<div class="empty">${this.t("nolights")}</div>`}</div>
+        <div class="alls"><div class="bn" data-all="turn_on">${this.t("allon")}</div><div class="bn" data-all="turn_off">${this.t("alloff")}</div></div></div>
+      <div class="sec" data-t="${this.t('usage')}"><div class="row"><span>Solar</span><b>${this._fmtW(sol)}</b></div>
+        <div class="row"><span>${this.t("grid")}</span><b>${this._fmtW(grid)}</b></div></div>
+      <div class="sec" data-t="${this.t('rooms')}">${rooms || `<div class="empty">${this.t("noth")}</div>`}</div>`;
     const R = `
-      <div class="sec" data-t="ÜBERWACHUNG">${cams.length ? `<div class="cs rot">${cams.map((e, i) => `<img class="cam ${i === this._cam % cams.length ? "on" : ""}" data-n="${E(this._name(e))}" src="${this._img(e)}">`).join("")}
-        <div class="cn">${E(this._name(cams[this._cam % cams.length]))}</div></div>` : `<div class="empty">Keine Kameras</div>`}</div>
-      <div class="sec" data-t="WETTER">${w ? `<div class="big">${w.attributes.temperature ?? "–"}°</div><div class="cap">${E(w.state.toUpperCase())}</div>` : `<div class="empty">–</div>`}</div>
-      <div class="sec" data-t="MÜLLABHOLUNG">${waste || `<div class="empty">Kein Müll-Sensor gewählt</div>`}</div>`;
+      <div class="sec" data-t="${this.t('surveillance')}">${cams.length ? `<div class="cs rot">${cams.map((e, i) => `<img class="cam ${i === this._cam % cams.length ? "on" : ""}" data-n="${E(this._name(e))}" src="${this._img(e)}">`).join("")}
+        <div class="cn">${E(this._name(cams[this._cam % cams.length]))}</div></div>` : `<div class="empty">${this.t("nocams")}</div>`}</div>
+      <div class="sec" data-t="${this.t('weather')}">${w ? `<div class="big">${w.attributes.temperature ?? "–"}°</div><div class="cap">${E(w.state.toUpperCase())}</div>` : `<div class="empty">–</div>`}</div>
+      <div class="sec" data-t="${this.t('waste')}">${waste || `<div class="empty">${this.t("nowaste")}</div>`}</div>`;
     return `<div class="grid"><div class="col">${L}</div><div class="col">${M}</div><div class="col">${R}</div></div>`;
   }
   _room(e) { return this._name(e).replace(/better.?thermostat/i, "").replace(/thermostat/i, "").replace(/wand/i, "").trim(); }
@@ -203,7 +206,7 @@ class EdisonDashboard extends HTMLElement {
   _messages() {
     const m = [];
     for (const e of this.batteries) { const x = this._val(e); if (!isNaN(x) && x < 10) m.push(`${this._name(e)}: ${x} %`); }
-    for (const e of this._ids("binary_sensor", (i, s) => ["moisture", "smoke"].includes(s.attributes.device_class) && s.state === "on")) m.push(`${this._name(e)}: ALARM`);
+    for (const e of this._ids("binary_sensor", (i, s) => ["moisture", "smoke"].includes(s.attributes.device_class) && s.state === "on")) m.push(`${this._name(e)}: ${this.t("alarm")}`);
     return m;
   }
   _waste() {
@@ -219,21 +222,21 @@ class EdisonDashboard extends HTMLElement {
     const pw = this._ids("sensor", (e, s) => s.attributes.device_class === "power" && !isNaN(Number(s.state))).slice(0, 12);
     const en = this._ids("sensor", (e, s) => s.attributes.device_class === "energy" && s.attributes.state_class && !isNaN(Number(s.state))).slice(0, 12);
     const rows = l => l.map(e => `<div class="row" data-mi="${e}"><span>${E(this._name(e))}</span><b>${E(S[e].state)} ${E(S[e].attributes.unit_of_measurement || "")}</b></div>`).join("") || `<div class="empty">–</div>`;
-    return `<div class="grid"><div class="sec" data-t="LEISTUNG"><div class="big">${this._fmtW(this._val(this.solar))}</div><div class="cap">SOLAR</div>
+    return `<div class="grid"><div class="sec" data-t="${this.t('power')}"><div class="big">${this._fmtW(this._val(this.solar))}</div><div class="cap">SOLAR</div>
       <div class="big" style="font-size:22px">${this._fmtW(this._val(this.grid))}</div><div class="cap">NETZ</div></div>
-      <div class="sec" data-t="LEISTUNGS-SENSOREN">${rows(pw)}</div><div class="sec" data-t="ENERGIE">${rows(en)}</div></div>`;
+      <div class="sec" data-t="${this.t('pwrs')}">${rows(pw)}</div><div class="sec" data-t="${this.t('energy')}">${rows(en)}</div></div>`;
   }
   _v_heizung() {
     const S = this._hass.states;
     const cards = this.climates.map(e => { const s = S[e]; if (!s) return ""; const heat = s.attributes.hvac_action === "heating", m = s.state;
       return `<div class="rc ${heat ? "heat" : ""}">${heat ? `<ha-icon class="hb" icon="mdi:lightbulb-on"></ha-icon>` : ""}
         <div class="nm" data-mi="${e}">${E(this._room(e).toUpperCase())}</div>
-        <div class="big">${s.attributes.current_temperature ?? "–"}°</div><div class="tg">Soll ${s.attributes.temperature ?? "–"}°</div>
-        <div class="acts"><div class="bn ${m === "off" ? "on" : ""}" data-hv="${e}|off">AUS</div>
-        <div class="bn ${m === "heat" ? "on" : ""}" data-hv="${e}|heat">HEIZEN</div><div class="bn" data-boost="${e}">BOOST</div></div></div>`; }).join("");
+        <div class="big">${s.attributes.current_temperature ?? "–"}°</div><div class="tg">${this.t("target")}${s.attributes.temperature ?? "–"}°</div>
+        <div class="acts"><div class="bn ${m === "off" ? "on" : ""}" data-hv="${e}|off">${this.t("off")}</div>
+        <div class="bn ${m === "heat" ? "on" : ""}" data-hv="${e}|heat">${this.t("heat")}</div><div class="bn" data-boost="${e}">${this.t("boost")}</div></div></div>`; }).join("");
     const b = this.C.boiler_temp, f = this.C.flow_temp;
     const banner = (b || f) ? `<div class="sec" data-t="KESSEL" style="margin-bottom:12px">${b ? `<div class="row"><span>${E(this._name(b))}</span><b>${E(S[b]?.state)}°</b></div>` : ""}${f ? `<div class="row"><span>${E(this._name(f))}</span><b>${E(S[f]?.state)}°</b></div>` : ""}</div>` : "";
-    return banner + `<div class="rcg">${cards || `<div class="empty">Keine Thermostate</div>`}</div>`;
+    return banner + `<div class="rcg">${cards || `<div class="empty">${this.t("noth")}</div>`}</div>`;
   }
   _v_kamera() {
     const c = this.cameras.slice(0, 3);
@@ -243,7 +246,7 @@ class EdisonDashboard extends HTMLElement {
     const S = this._hass.states;
     const t = this.batteries.map(e => { const x = this._val(e), cls = isNaN(x) ? "o" : x < 10 ? "r" : x < 30 ? "m" : "g";
       return `<div class="bt ${cls}" data-mi="${e}"><div>${E(this._name(e))}</div><div class="big">${isNaN(x) ? "–" : x + " %"}</div></div>`; }).join("");
-    return `<div class="tiles">${t || `<div class="empty">Keine Batterie-Sensoren</div>`}</div>`;
+    return `<div class="tiles">${t || `<div class="empty">${this.t("nobat")}</div>`}</div>`;
   }
 
   /* ---------- fit to screen ---------- */

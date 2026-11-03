@@ -15,6 +15,6 @@ add('sensor.waste','x',{'2026-11-04':'Bioabfall','2026-11-10':'Restmüll'});
 window.calls=[];
 const el=document.createElement('edison-dashboard');el.style.height='800px';el.style.display='block';
 document.getElementById('h').appendChild(el);
-el.panel={config:{title:'Chasovas / Lemkes Home',subtitle:'Smart Home',config:{waste:'sensor.waste'}}};
+el.panel={config:{title:'Mein Zuhause',subtitle:'Smart Home',config:{waste:'sensor.waste'}}};
 el.hass={states:st,language:'de',callService:(d,s,x)=>window.calls.push([d,s,x])};
 </script></body></html>
