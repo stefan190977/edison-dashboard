@@ -1,0 +1,20 @@
+<!doctype html><html><body style="margin:0"><div id="h" style="width:1280px;height:800px"></div>
+<script src="../custom_components/edison_dashboard/frontend/edison-dashboard.js"></script>
+<script>
+const st={};const add=(e,s,a={})=>st[e]={entity_id:e,state:s,attributes:a};
+add('weather.home','sunny',{temperature:12});
+add('sensor.solar','1530',{device_class:'power',friendly_name:'Solar Leistung',unit_of_measurement:'W'});
+add('sensor.grid','-200',{device_class:'power',friendly_name:'Netz',unit_of_measurement:'W'});
+add('alarm_control_panel.alarmo','disarmed',{});
+for(const [i,n] of ['Garten','Treppe','Bad','Keller','Haus'].entries())add('light.l'+i,i%2?'on':'off',{friendly_name:n});
+for(const n of ['flur','kueche','bad'])add('climate.'+n+'_better_thermostat','heat',{friendly_name:n+' Better Thermostat',current_temperature:20.5,temperature:21,hvac_action:n=='flur'?'heating':'idle'});
+for(const n of ['a','b'])add('camera.'+n,'idle',{friendly_name:'Cam '+n,entity_picture:'data:,'});
+add('sensor.bat1','8',{device_class:'battery',friendly_name:'Fenster Bad'});
+add('sensor.bat2','90',{device_class:'battery',friendly_name:'Tür'});
+add('sensor.waste','x',{'2026-11-04':'Bioabfall','2026-11-10':'Restmüll'});
+window.calls=[];
+const el=document.createElement('edison-dashboard');el.style.height='800px';el.style.display='block';
+document.getElementById('h').appendChild(el);
+el.panel={config:{title:'Chasovas / Lemkes Home',subtitle:'Smart Home',config:{waste:'sensor.waste'}}};
+el.hass={states:st,language:'de',callService:(d,s,x)=>window.calls.push([d,s,x])};
+</script></body></html>

@@ -1,0 +1,58 @@
+{
+ "config": {
+  "step": {
+   "user": {
+    "title": "Set up Edison Dashboard",
+    "description": "All entities are optional. Leave empty for auto discovery.",
+    "data": {
+     "title": "Titel",
+     "subtitle": "Untertitel",
+     "show_in_sidebar": "In Seitenleiste anzeigen",
+     "kiosk": "Vollbild (ohne HA-Leisten)",
+     "weather": "Wetter",
+     "solar_power": "Solarleistung (W)",
+     "grid_power": "Netzleistung (W)",
+     "boiler_temp": "Kessel-Temperatur",
+     "flow_temp": "Vorlauf-Temperatur",
+     "alarm": "Alarmanlage",
+     "waste": "Müllabholung (Sensor mit Datums-Attributen)",
+     "lights": "Lichter",
+     "climates": "Heizkörper-Thermostate",
+     "cameras": "Kameras",
+     "batteries": "Batterie-Sensoren",
+     "status_sensors": "Status-Sensoren",
+     "boost_script": "Boost-Skript"
+    }
+   }
+  },
+  "abort": {
+   "single_instance_allowed": "Nur eine Instanz möglich."
+  }
+ },
+ "options": {
+  "step": {
+   "init": {
+    "title": "Edison Dashboard",
+    "data": {
+     "title": "Titel",
+     "subtitle": "Untertitel",
+     "show_in_sidebar": "In Seitenleiste anzeigen",
+     "kiosk": "Vollbild (ohne HA-Leisten)",
+     "weather": "Wetter",
+     "solar_power": "Solarleistung (W)",
+     "grid_power": "Netzleistung (W)",
+     "boiler_temp": "Kessel-Temperatur",
+     "flow_temp": "Vorlauf-Temperatur",
+     "alarm": "Alarmanlage",
+     "waste": "Müllabholung",
+     "lights": "Lichter",
+     "climates": "Heizkörper-Thermostate",
+     "cameras": "Kameras",
+     "batteries": "Batterie-Sensoren",
+     "status_sensors": "Status-Sensoren",
+     "boost_script": "Boost-Skript"
+    }
+   }
+  }
+ }
+}

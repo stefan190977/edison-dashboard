@@ -1,0 +1,13 @@
+{
+  "domain": "edison_dashboard",
+  "name": "Edison Dashboard",
+  "codeowners": [],
+  "config_flow": true,
+  "dependencies": ["frontend", "panel_custom", "http"],
+  "documentation": "https://github.com/stefan190977/edison-dashboard",
+  "issue_tracker": "https://github.com/stefan190977/edison-dashboard/issues",
+  "iot_class": "calculated",
+  "integration_type": "service",
+  "single_config_entry": true,
+  "version": "0.1.0"
+}
