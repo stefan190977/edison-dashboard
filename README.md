@@ -4,6 +4,15 @@ Ein Smart-Home-Panel im Thomas-Edison-Stil (Messing, Glühlampen, Nixie-Uhr) fü
 
 **Seiten:** Übersicht (3 Spalten), Solar, Heizung, Kamera, Batterie. Zurück-Button, Lichter einzeln und „Alle an/aus“, Kamera-Wechsel alle 2 Minuten, Zoom/Doppeltipp deaktiviert, automatische Skalierung auf die Bildschirmgröße.
 
+## Bilder
+*(Beispielansichten mit Demo-Daten)*
+
+![Übersicht](docs/home.png)
+![Heizung](docs/heizung.png)
+![Solar](docs/solar.png)
+![Kamera](docs/kamera.png)
+![Batterie](docs/batterien.png)
+
 ## Installation
 1. HACS → ⋮ → *Benutzerdefinierte Repositories* → URL dieses Repos, Kategorie **Integration**.
 2. „Edison Dashboard“ installieren, Home Assistant neu starten.
